@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>CivicNet EasyMiner</title>
+<style>
+  body { font-family: sans-serif; background: #0e1a2b; color: #f2f0e8; padding: 20px; margin: 0; }
+  h2 { margin-top: 0; }
+  input { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; background: #16263d; border: 1px solid #2a3f5c; color: white; border-radius: 4px; }
+  button { padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-right: 10px; }
+  #startBtn { background: #34d9c9; color: #0e1a2b; }
+  #stopBtn { background: #e05f5f; color: white; }
+  #status { margin-top: 15px; font-weight: bold; }
+  #log { margin-top: 15px; background: #091220; padding: 10px; height: 180px; overflow-y: auto; font-family: monospace; font-size: 12px; white-space: pre-wrap; border-radius: 4px; }
+</style>
+</head>
+<body>
+  <h2>CivicNet EasyMiner</h2>
+  <input id="address" type="text" placeholder="Paste your CIVIC wallet address (civc1...)">
+  <select id="threads" style="width:100%;padding:10px;margin:10px 0;background:#16263d;border:1px solid #2a3f5c;color:white;border-radius:4px;">
+    <option value="max">Use all CPU threads</option>
+    <option value="1">1 thread</option>
+    <option value="2">2 threads</option>
+    <option value="4">4 threads</option>
+    <option value="6">6 threads</option>
+    <option value="8">8 threads</option>
+  </select>
+  <button id="startBtn">Start Mining</button>
+  <button id="stopBtn">Stop</button>
+  <div id="status">Status: Idle</div>
+  <div id="log"></div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    document.getElementById('startBtn').onclick = () => {
+      const addr = document.getElementById('address').value.trim();
+      if (!addr) { alert('Enter your CIVIC address first'); return; }
+      const threads = document.getElementById('threads').value;
+      ipcRenderer.send('start-mining', { address: addr, threads: threads });
+      document.getElementById('status').textContent = 'Status: Mining...';
+    };
+
+    document.getElementById('stopBtn').onclick = () => {
+      ipcRenderer.send('stop-mining');
+      document.getElementById('status').textContent = 'Status: Stopped';
+    };
+
+    ipcRenderer.on('miner-log', (event, data) => {
+      const log = document.getElementById('log');
+      log.textContent += data;
+      log.scrollTop = log.scrollHeight;
+    });
+
+    ipcRenderer.on('miner-stopped', () => {
+      document.getElementById('status').textContent = 'Status: Idle';
+    });
+  </script>
+</body>
+</html>

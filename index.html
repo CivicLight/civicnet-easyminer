@@ -17,6 +17,14 @@
 <body>
   <h2>CivicNet EasyMiner</h2>
   <input id="address" type="text" placeholder="Paste your CIVIC wallet address (civc1...)">
+  <select id="pool" style="width:100%;padding:10px;margin:10px 0;background:#16263d;border:1px solid #2a3f5c;color:white;border-radius:4px;">
+    <option value="stratum+tcp://stratum.civiclight.xyz:3032">Official Pool</option>
+    <option value="stratum+tcp://eu.nitropool.net:3032">NitroPool (EU)</option>
+    <option value="stratum+tcp://au.nitropool.net:3032">NitroPool (AU)</option>
+    <option value="stratum+tcp://us.nitropool.net:3032">NitroPool (US)</option>
+    <option value="stratum+tcp://nl.rabbitminer.cc:1104">RabbitMiner (NL)</option>
+    <option value="stratum+tcp://fi.rabbitminer.cc:1104">RabbitMiner (FI)</option>
+  </select>
   <select id="threads" style="width:100%;padding:10px;margin:10px 0;background:#16263d;border:1px solid #2a3f5c;color:white;border-radius:4px;">
     <option value="max">Use all CPU threads</option>
     <option value="1">1 thread</option>
@@ -37,7 +45,8 @@
       const addr = document.getElementById('address').value.trim();
       if (!addr) { alert('Enter your CIVIC address first'); return; }
       const threads = document.getElementById('threads').value;
-      ipcRenderer.send('start-mining', { address: addr, threads: threads });
+      const pool = document.getElementById('pool').value;
+      ipcRenderer.send('start-mining', { address: addr, threads: threads, pool: pool });
       document.getElementById('status').textContent = 'Status: Mining...';
     };
 

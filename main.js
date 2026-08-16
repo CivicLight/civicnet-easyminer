@@ -30,14 +30,16 @@ ipcMain.on('start-mining', (event, data) => {
   if (minerProcess) return;
   const address = data.address;
   const threads = data.threads;
+  const pool = data.pool || 'stratum+tcp://stratum.civiclight.xyz:3032';
+  const password = 'x';
   const minerPath = app.isPackaged
     ? path.join(process.resourcesPath, 'miner', 'cpuminer.exe')
     : path.join(__dirname, 'miner', 'cpuminer.exe');
   const args = [
     '-a', 'civiclight',
-    '-o', 'stratum+tcp://stratum.civiclight.xyz:3032',
+    '-o', pool,
     '-u', address,
-    '-p', 'x'
+    '-p', password
   ];
   if (threads && threads !== 'max') {
     args.push('-t', String(threads));
